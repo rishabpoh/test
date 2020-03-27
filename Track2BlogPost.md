@@ -8,11 +8,12 @@ ms.date: 02/25/2020
 
 # Announcing the Azure Storage v12 client libraries
 
-For nearly two years now, there has been a big push within the Azure organization to build SDKs which are consistent across services and idiomatic to each programming language. With the goal being to ease the learning curve that programmers face when adopting our new services, we were able to create an architecture which is more resilient, performant, reliable, and robust. All while embracing the ecosystem native to each language. There will also be familiarity in that once you learn how to use features in one library, you will also know how to use them in others. This architecture has been applied to our v12 client libraries in .NET, Java, Python, and JavaScript.
+Azure SDK has spent the last year developing an architecture focused on easing the learning curve that programmers face when adopting our services. To achieve this, we prioritized embracing the ecosystem of each language, ensuring that naming conventions and syntax for methods are familiar with respect to language. We also maintained consistency across services, so developers will find that learning how to use one library will make it easier to pick up and take advantage of the other ones. The new Azure Storage client libraries offer full support of both synchronous and asynchronous APIs. All v12 libraries are thread safe and offer core functionalities like HTTP retries, logging, transport protocols, and authentication protocols. There is also feature parity, so all major scenarios covered by previous versions of the library can be done using the v12 equivalent. These libraries are more resilient, performant, reliable, and robust. After months of development and feedback, we are proud to announce the general availability of our v12 client libraries in [.NET](https://github.com/Azure/azure-sdk-for-net/tree/master/sdk/storage), [Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/storage), [Python](https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/storage), and [JavaScript](https://github.com/Azure/azure-sdk-for-js/tree/master/sdk/storage).
 
-The new Azure Storage client libraries offer full support of both synchronous and asynchronous APIs. All v12 libraries are thread safe and offer core functionalities like HTTP retries, logging, transport protocols, authentication protocols, etc. While in preview, we also made the necessary improvements to ensure parity with legacy versions for all major scenarios.
+Although breaking changes were introduced, this new architecture will stand the test of time. Upgrade your codebase to v12 to take advantage of the latest features. If you cannot update your codebase but would still like to utilize new features, note that v12 can be used side-by-side with a legacy version. Check out this [example]().
+// Include side-by-side example
+// Migration guidelines
 
-These client libraries are generally available now. Although breaking changes were introduced, this new architecture will stand the test of time. We are proud to announce the v12 client libraries.
 
 ## SDK guidelines
 
@@ -65,7 +66,7 @@ We urge developers to submit feature requests and bug fixes in the issues sectio
 
 ## Deprecation notice
 
-The legacy versions of each library remain supported and will be updated on an exceptional basis, such as a security vulnerability. Versions being deprecated include .NET v11, Java v11, Python v2, JavaScript v10, and all other previous versions.
+The legacy versions of each client library in .NET, Java, Python, and JavaScript will be deprecated. They will only be updated on an exceptional basis, such as a security vulnerability.
 
 Note that we have officially moved off our old GitHub repo links. The table below shows the mapping from the old repos to the new repos.
 
