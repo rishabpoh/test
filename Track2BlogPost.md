@@ -29,9 +29,9 @@ With this new architecture comes breaking changes. For users interested in migra
 | [Python Quickstart](https://docs.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-python) | [Python Reference](https://docs.microsoft.com/en-us/python/api/overview/azure/storage-index?view=azure-python) | [Python Samples](https://docs.microsoft.com/azure/storage/common/storage-samples-python?toc=%2fazure%2fstorage%2fblobs%2ftoc.json) |
 | [JavaScript Quickstart](https://docs.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-nodejs) | [JavaScript Reference](https://docs.microsoft.com/en-us/javascript/api/overview/azure/storage-overview?view=azure-node-latest) | [JavaScript Samples](https://docs.microsoft.com/azure/storage/common/storage-samples-javascript?toc=%2fazure%2fstorage%2fblobs%2ftoc.json) |
 
-## Deprecation notice
+## Announcing Deprecation
 
-With the introduction of our new libraries come the deprecation of our old libraries. All previous versions of the .NET, Java, Python, and JavaScript libraries will be deprecated. This is an announcement, so for the next 12 months the legacy libraries will be updated on exceptional bases (security vulnerabilities, major asks, etc.) and we will continue showing documentation for the previous versions of the libraries. Refer to our [Lifecycle FAQ](https://support.microsoft.com/en-us/help/18486/lifecycle-faq-azure) page.
+With the introduction of our new libraries come the deprecation of our old libraries. All previous versions of the .NET, Java, Python, and JavaScript libraries will be deprecated. For the next 12 months the legacy libraries will be updated on exceptional bases (security vulnerabilities, major asks, etc.) and we will continue providing documentation for the previous versions of the libraries. Refer to our [Lifecycle FAQ](https://support.microsoft.com/en-us/help/18486/lifecycle-faq-azure) page.
 
 Note that we have officially moved off our old GitHub repo links. The table below shows the mapping from the old repos to the new repos.
 
