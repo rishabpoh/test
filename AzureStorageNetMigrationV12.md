@@ -1,4 +1,4 @@
-# Guide for migrating to Azure.Storage.Blobs from Microsoft.Azure.Blobs
+# Guide for migrating to Azure.Storage.Blobs from Microsoft.Azure.Storage.Blob
 
 This guide intends to assist customers in migrating from version 11 of the Azure Storage .NET library for Blobs to version 12.
 It will focus on side-by-side comparisons for similar operations between the v12 package, [`Azure.Storage.Blobs`](https://www.nuget.org/packages/Azure.Storage.Blobs) and v11 package, [`Microsoft.Azure.Storage.Blob`](https://www.nuget.org/packages/Microsoft.Azure.Storage.Blob/).
@@ -35,12 +35,12 @@ Note: The blog post linked above announces deprecation for previous versions of 
 
 Package names and the namespaces root for version 12 Azure client libraries follow the pattern `Azure.[Area].[Service]` where the legacy libraries followed the pattern `Microsoft.Azure.[Area].[Service]`.
 
-In this case, to install the v12 package with Nuget:
+In this case, to install the legacy v11 package with Nuget:
 ```
 dotnet add package Azure.Storage.Blobs
 ```
 
-Legacy (v11):
+It is now the following for v12:
 ```
 dotnet add package Microsoft.Azure.Storage.Blob
 ```
@@ -49,14 +49,23 @@ dotnet add package Microsoft.Azure.Storage.Blob
 
 #### Managed Identity
 
-#### SAS
-
 Legacy (v11)
 
 v12
+
+#### SAS
+
+There are various SAS tokens that may be generated. Visit our documentation pages to learn how to [Create a User Delegation SAS](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-user-delegation-sas-create-dotnet), [Create a Service SAS](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-service-sas-create-dotnet), or [Create an Account SAS](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-sas-create-dotnet?toc=/azure/storage/blobs/toc.json).
+
+Legacy (v11)
 ```c
-// Create a service level SAS that only allows reading from service
-// level APIs
+
+```
+
+v12
+```c
+// This code snippet creates a service level SAS that only allows reading
+// from service level APIs
 AccountSasBuilder sas = new AccountSasBuilder
 {
     // Allow access to blobs
@@ -85,9 +94,13 @@ BlobServiceClient service = new BlobServiceClient(sasUri.Uri);
 await service.GetPropertiesAsync();
 ```
 
+Summary:
+
 #### Connection string
 
 The following code assumes you have acquired your connection string (you can do so from the Access Keys tab under Settings in your Portal Storage Account blade). It is recommended to store it in an environment variable.
+
+Parsing the connection string in v11 vs v12.....
 
 Legacy (v11)
 ```c
@@ -117,9 +130,15 @@ BlobServiceClient service = new BlobServiceClient(connectionString);
 await service.GetPropertiesAsync();
 ```
 
+### Shared Access Policies
+
+TBD
+
 ### Client hierarchy
 
-In the interest of simplifying the API surface we've made a three top level clients.
+In the interest of simplifying the API surface we've made a three top level clients that can be used to interact with a majority of your resources: `BlobServiceClient`, `BlobContainerClient`, and `BlobClient`.
+
+[//]: # (Blob Metadata, properties, and attributes...)
 
 ### Client constructors
 
@@ -127,14 +146,14 @@ In the interest of simplifying the API surface we've made a three top level clie
 |-------|--------|
 | `CloudStorageAccount` | `BlobServiceClient` |
 | `CloudBlobContainer`  | `BlobContainerClient` |
-| `CloudBlobClient` or `CloudBlockBlob` | `BlobClient` |
+| `CloudBlobClient` | `BlobClient` |
+| `CloudBlockBlob` | `BlockBlobClient` |
 
 ### Creating a Container
 
 v11
 ```c
-// Create the CloudBlobClient that represents the
-// Blob storage endpoint for the storage account.
+// Create the CloudBlobClient that represents the Blob storage endpoint for the storage account.
 CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
 
 CloudBlobContainer cloudBlobContainer =
@@ -148,27 +167,16 @@ v12
 BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
 
 // Create a unique name for the container
-string containerName = "yourcontainer");
+string containerName = "yourcontainer";
 
 // Create the container and return a container client object
 BlobContainerClient containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
-
-string containerName = "sample-container";
-
-// Get a reference to a container named "sample-container" and then create it
-BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
-container.Create();
 ```
 
-Summary: In version 11, you would have to use the storage account endpoint to create the `CloudBlobClient`. Then you can get the container reference by calling the `GetContainerReference` method and create it by calling `CreateAsync()` on it. In version 12, you will create the
+Summary: In version 11, you would have to use the storage account endpoint to create the `CloudBlobClient`. Then you can get the container reference by calling the `GetContainerReference` method and create it by calling `CreateAsync()` on it. In version 12, you will use the `BlobServiceClient` object to then create `BlobContainerClient`.
 
 
 ### Uploading Blobs to a Container
-
-| V11 Method | V12 Equivalent |
-| --- | --- |
-| GetBlockBlobReference() | GetBlobClient() |
-| UploadFromFileAsync() | UploadAsync() |
 
 v11
 ```c
@@ -184,9 +192,11 @@ await cloudBlockBlob.UploadFromFileAsync(localFilePath);
 v12
 ```c
 // Assumes containerClient already contains a reference to the container.
+// filename is the intended blob name as a string
+// localFilePath should be the path to the local file you want to upload
 
 // Get a reference to a blob
-BlobClient blobClient = containerClient.GetBlobClient(fileName);
+BlobClient blobClient = containerClient.GetBlobClient(filename);
 
 // Open the file and upload its data
 using FileStream uploadFileStream = File.OpenRead(localFilePath);
@@ -200,38 +210,31 @@ Summary: In v11, you would get the `CloudBlockBlob` reference by calling the `Ge
 ### Downloading Blobs from a Container
 
 Legacy (v11)
-```
-// Download the blob to a local file, using the reference created earlier.
-// Append the string "_DOWNLOADED" before the .txt extension so that you
-// can see both files in MyDocuments.
-string destinationFile = sourceFile.Replace(".txt", "_DOWNLOADED.txt");
-Console.WriteLine("Downloading blob to {0}", destinationFile);
-await cloudBlockBlob.DownloadToFileAsync(destinationFile, FileMode.Create);
+```c
+// Assumes you have already created a reference to the blob via blobClient
+// downloadFilePath should be the path to the intended file to download the blob to
+await cloudBlockBlob.DownloadToFileAsync(downloadFilePath, FileMode.Create);
 ```
 
 v12
 ```c
-// Get a reference to a blob named "sample-file"
-BlobClient blob = container.GetBlobClient(Randomize("sample-file"));
+// Assumes you have already created a reference to the blob via blobClient
+// downloadFilePath should be the path to the intended file to download the blob to
+BlobDownloadInfo download = await blobClient.DownloadAsync();
 
-// First upload something the blob so we have something to download
-blob.Upload(File.OpenRead(originalPath));
-
-// Download the blob's contents and save it to a file
-BlobDownloadInfo download = blob.Download();
-using (FileStream file = File.OpenWrite(downloadPath))
+using (FileStream downloadFileStream = File.OpenWrite(downloadFilePath))
 {
-    download.Content.CopyTo(file);
+    await download.Content.CopyToAsync(downloadFileStream);
+    downloadFileStream.Close();
 }
 ```
-
 
 ### Listing Blobs in a Container
 
 Legacy (v11)
 ```c
 // List the blobs in the container.
-Console.WriteLine("List blobs in container.");
+// Assumes a reference to the container via `cloudBlobContainer`
 BlobContinuationToken blobContinuationToken = null;
 do
 {
@@ -247,19 +250,17 @@ do
 
 v12
 ```c
-// Get a reference to a container named "sample-container" and then create it
+// Get a reference to the container
 BlobContainerClient container = new BlobContainerClient(connectionString, containerName);
 
-// Print out all the blob names
-foreach (BlobItem blob in container.GetBlobs())
+// List all blobs in the container
+await foreach (BlobItem blobItem in containerClient.GetBlobsAsync())
 {
-    Console.WriteLine(blob.Name);
+    Console.WriteLine("\t" + blobItem.Name);
 }
 ```
 
 ### Other
-
-
 
 ## Additional samples
 
