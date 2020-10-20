@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Files.Shares;
@@ -9,6 +10,12 @@ namespace LargeFileMigrationScript
 {
     class Program
     {
+        #region Definitions
+        private delegate Task<SlicedStream> GetNextStreamPartition(
+            Stream stream,
+            );
+
+
         static void Main(string[] args)
         {
             // Required to authenticate to storage account
@@ -21,7 +28,11 @@ namespace LargeFileMigrationScript
 
             // Get a reference to a share and create it
             ShareClient share = new ShareClient(storageConnectionString, shareName);
-            await share.createAsnc();
+            await share.createAsync();
+
+            int maxWorkerCount = 20;
+
+            return await UploadInParallelAsync();
 
             Console.WriteLine("Migrating files from to .");
 
@@ -40,6 +51,16 @@ namespace LargeFileMigrationScript
 
             // Partition fileshare into byte ranges
             await foreach ()
+
+        }
+
+        private static async IAsyncEnumerable<SlicedStream> GetPartitionsAsync(
+            Stream stream,
+            long? streamLength,
+            GetNextStreamPartition getNextPartition,
+            bool async,
+            [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
 
         }
     }
